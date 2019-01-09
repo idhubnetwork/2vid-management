@@ -1,33 +1,45 @@
 <template>
   <div>
+    <div class="title has-text-centered">
+      <h1>Credential Viewer: Encode</h1>
+    </div>
     <div class="field">
       <label class="label">Credential Issuer: 证书签发者（必须）</label>
-      <input class="input" type="text" v-model="credJWTPayload.iss"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.iss"></input>
     </div>
     <div class="field">
       <label class="label">Credential Audience: 证书接收方（必须）</label>
-      <input class="input" v-model="credJWTPayload.aud"></input>
+      <input class="input" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.aud"></input>
     </div>
     <div class="field">
       <label class="label">Credential Subject: 证书主题（必须）</label>
-      <input class="input" v-model="credJWTPayload.sub"></input>
+      <input class="input" placeholder="credential subject defined by did application" v-model="credJWTPayload.sub"></input>
     </div>
     <div class="field">
+      <label class="label">Credential Expire Time: 证书有效期（默认：6个月）</label>
+      <date-picker v-model="expireDate" :not-before="new Date()" :clearable=false type="datetime" lang="en" format="YYYY-MM-DD hh:mm:ss" @confirm="updateExpireTime()" confirm></date-picker>
+      time: {{expireDate}}
+    </div>
+    <!-- <div class="field">
       <label class="label">Raw Credential:</label>
       <textarea class="textarea" v-model="credJWTSigningInput"></textarea>
-    </div>
+    </div> -->
     <div class="field">
-      <label class="label">Signed Credential:</label>
-      <textarea class="textarea" v-model="credJWT" placeholder="Signed Credential"></textarea>
+      <label class="label">Signed Credential: 带签名的证书</label>
+      <textarea class="textarea" v-model="credJWT" placeholder="Signed Credential" readonly></textarea>
     </div>
     <button class="button is-link is-rounded" @click="signCredential()">
       Sign
+    </button>
+    <button class="button is-rounded" @click="test()">
+      Test
     </button>
   </div>
 </template>
 <script>
 import JwtUtility from '@/util/JwtUtility.js'
 import MathUtility from '@/util/MathUtility.js'
+import DatePicker from 'vue2-datepicker'
 
 export default {
   props: [
@@ -35,6 +47,7 @@ export default {
   ],
   data () {
     return {
+      expireDate: {},
       credJWTSigningInput: '',
       credJWTHeader: {
         alg: 'ES256k',
@@ -44,7 +57,7 @@ export default {
         iss: '',
         sub: '',
         aud: '',
-        exp: 1569859200,
+        exp: 0,
         // jti: 123,
         net: 'eth_ropsten',
         ipfs: 'jwt合规说明书链接（可选，默认存储在IPFS上）',
@@ -56,8 +69,27 @@ export default {
     }
   }, computed: {
 
+  }, components: {
+    DatePicker
+  }, mounted() {
+    this.resetExpireTime()
   }, methods: {
+    updateExpireTime: function() {
+      console.log(Math.round(this.expireDate.getTime()/1000))
+      this.credJWTPayload.exp = Math.round(this.expireDate.getTime()/1000)
+    },
+    resetExpireTime: function() {
+      var date = new Date()
+      // 默认有效期 month 个月
+      const month = 6
+      this.expireDate = new Date(date.setMonth(date.getMonth() + month))
+      this.credJWTPayload.exp = Math.round(this.expireDate.getTime()/1000)
+    },
+    test: function() {
+      console.log("test button is clicked")
+    },
     transfer: function() {
+      console.log(this.expireDate)
       this.credJWTSigningInput = JwtUtility.base64url.encode(JSON.stringify(this.credJWTHeader)) + '.' + JwtUtility.base64url.encode(JSON.stringify(this.credJWTPayload))
     },
     sign: function() {

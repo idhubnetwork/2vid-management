@@ -41,7 +41,7 @@
     </div>
     <div class="field">
       <label class="label">turn back:</label>
-      <textarea class="textarea" v-model="turnBack" placeholder="turnBack"></textarea>
+      <textarea class="textarea" v-model="oprationResponse" placeholder="oprationResponse" readonly></textarea>
     </div>
     <button class="button is-link is-rounded" @click="sendRequestToken()">
       Create
@@ -89,7 +89,7 @@ export default {
       	jwt_jti: 123
       },
       requestJsonTokenSig: '',
-      turnBack: ''
+      oprationResponse: ''
     }
   },
   methods: {
@@ -167,13 +167,13 @@ export default {
           })
         })
         .then(res => {
-          this.turnBack = res.data.toString()
+          this.oprationResponse = res.data.toString()
           // console.log('here is the message' + this.message)
           resolve("Stuff worked!")
         }).catch(
           err => {
             console.log(err)
-            this.turnBack = err.toString()
+            this.oprationResponse = err.toString()
             reject("err")
           }
         )
@@ -219,12 +219,12 @@ export default {
               jwt: this.credJWT
             }
           }).then(res => {
-            this.turnBack = res.data.toString()
+            this.oprationResponse = res.data.toString()
             resolve("Stuff worked!")
             // console.log('here is the message' + this.message)
           }).catch(err => {
             console.log(err)
-            this.turnBack = err.toString()
+            this.oprationResponse = err.toString()
             reject(err)
           })
         })

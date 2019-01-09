@@ -19,6 +19,14 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
+      state: {
+        date: new Date()
+      }
+    }
+  },
+  computed: {
+    getTimestamp: function () {
+      return Math.round(this.state.date/1000)
     }
   },
   components: {

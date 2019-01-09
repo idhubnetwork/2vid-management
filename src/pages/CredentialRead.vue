@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div>
-      <h1 class="subtitle has-text-centered">2vid Data Opertations: Read(Working In Process)</h1>
+    <div class="title has-text-centered">
+      <h1>2vid Data Opertation: Read</h1>
     </div>
     <div class="field">
-      <label class="label">New Signed Credential:</label>
+      <label class="label">A Credential for Parsing Parameters (Optional):</label>
       <textarea class="textarea" v-model="credJWT"></textarea>
       <button class="button is-link is-rounded" @click="parseCredJWT()">
         Parse Credential
@@ -12,22 +12,21 @@
     </div>
     <div class="field">
       <label class="label">DID: </label>
-      <input class="input" type="text" v-model="requestJsonTokenMsg.did"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.did"></input>
     </div>
     <div class="field">
       <label class="label">Issuer: </label>
-      <input class="input" v-model="requestJsonTokenMsg.jwt_iss"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_iss"></input>
     </div>
     <div class="field">
       <label class="label">Audience: </label>
-      <input class="input" type="text" v-model="requestJsonTokenMsg.jwt_aud"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_aud"></input>
     </div>
     <div class="field">
       <label class="label">Subject: </label>
-      <input class="input" v-model="requestJsonTokenMsg.jwt_sub"></input>
+      <input class="input" placeholder="credential subject defined by did application" v-model="requestJsonTokenMsg.jwt_sub"></input>
     </div>
-
-    <div class="field">
+    <!-- <div class="field">
       <label class="label">Signed Credential:</label>
       <textarea class="textarea" v-model="requestToken" placeholder="Signed Credential"></textarea>
     </div>
@@ -38,10 +37,10 @@
     <div class="field">
       <label class="label">requestJsonToken.sig</label>
       <textarea class="textarea" v-model="requestJsonToken.sig" placeholder="requestJsonToken.sig"></textarea>
-    </div>
+    </div> -->
     <div class="field">
-      <label class="label">turn back:</label>
-      <textarea class="textarea" v-model="turnBack" placeholder="turnBack"></textarea>
+      <label class="label">Result:</label>
+      <textarea class="textarea" v-model="oprationResponse" placeholder="oprationResponse" readonly></textarea>
     </div>
     <button class="button is-link is-rounded" @click="sendRequestToken()">
       Read
@@ -72,24 +71,27 @@ export default {
         // status: 11
       },
       credJWTSignature: '',
+      //credJWT is an input JWT and using for parsing the parameters like iss, aud, sub ...
       credJWT: '',
+      //credJWTResult is read from response.
+      credJWTResult: '',
       requestToken: '',
       requestJsonToken: {
         msg: '',
         sig: '',
       },
       requestJsonTokenMsg: {
-      	did: 'did:idhub:0x1234567890exampleEthereumAddress',
+      	did: '',
       	action: 'READ',
       	destination: 'idhub',
       	expiration: 1569859200,
-      	jwt_iss: 'did:idhub:0x1234567890exampleEthereumAddress',
-      	jwt_sub: 'credential subject defined by did application',
-      	jwt_aud: 'did:idhub:0x1234567890exampleEthereumAddress',
+      	jwt_iss: '',
+      	jwt_sub: '',
+      	jwt_aud: '',
       	// jwt_jti: 123
       },
       requestJsonTokenSig: '',
-      turnBack: ''
+      oprationResponse: ''
     }
   },
   methods: {
@@ -167,13 +169,13 @@ export default {
           })
         })
         .then(res => {
-          this.turnBack = res.data.toString()
+          this.oprationResponse = res.data.toString()
           // console.log('here is the message' + this.message)
           resolve("Stuff worked!")
         }).catch(
           err => {
             console.log(err)
-            this.turnBack = err.toString()
+            this.oprationResponse = err.toString()
             reject("err")
           }
         )
@@ -219,19 +221,18 @@ export default {
               jwt: this.credJWT
             }
           }).then(res => {
-            this.turnBack = res.data.toString()
+            this.oprationResponse = JSON.stringify(res.data)
             resolve("Stuff worked!")
             // console.log('here is the message' + this.message)
           }).catch(err => {
             console.log(err)
-            this.turnBack = err.toString()
+            this.oprationResponse = err.toString()
             reject(err)
           })
         })
       })
       .then(result => {
         console.log('correct')
-        alert('OK!')
       })
       .catch(err => {
         console.log(err)
