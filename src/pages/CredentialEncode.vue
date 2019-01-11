@@ -18,7 +18,6 @@
     <div class="field">
       <label class="label">Credential Expire Time: 证书有效期（默认：6个月）</label>
       <date-picker v-model="expireDate" :not-before="new Date()" :clearable=false type="datetime" lang="en" format="YYYY-MM-DD hh:mm:ss" @confirm="updateExpireTime()" confirm></date-picker>
-      time: {{expireDate}}
     </div>
     <!-- <div class="field">
       <label class="label">Raw Credential:</label>
@@ -125,7 +124,7 @@ export default {
         this.transfer()
         resolve("Transfer is done!")
       })
-      transferPromise.then(() => this.signPromise)
+      transferPromise.then(this.signPromise)
         .then(res => console.log(res))
         .catch(err => console.error(err))
     },
