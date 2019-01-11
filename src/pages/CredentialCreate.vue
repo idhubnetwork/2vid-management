@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="title has-text-centered">
+    <div class="title is-4 has-text-centered">
       <h1>2vid Data Opertation: Create</h1>
     </div>
     <div class="field">
@@ -42,9 +42,11 @@
       <label class="label">Result:</label>
       <textarea class="textarea" v-model="oprationResponse" placeholder="oprationResponse" readonly></textarea>
     </div>
-    <button class="button is-link is-rounded" @click="sendRequestToken()">
-      Create
-    </button>
+    <div class="field">
+      <button class="button is-link is-rounded" @click="sendRequestToken()">
+        Create
+      </button>
+    </div>
   </div>
 </template>
 <script>
@@ -91,6 +93,13 @@ export default {
       oprationResponse: ''
     }
   },
+  mounted: function() {
+    if (this.$store.getters.getExchangeData.credJWT) {
+      this.credJWT = this.$store.getters.getExchangeData.credJWT
+      console.log("credJWT initialized.")
+      this.$store.dispatch('setExchangeData', null)
+    }
+  },
   methods: {
     setExpireTime: function(value) {
       var second = (value) ? value : 3600
@@ -109,7 +118,7 @@ export default {
           console.log(Buffer.from(JwtUtility.base64url.decode(this.credJWT.split('.')[2])).toString('hex'))
           this.credJWTHeader = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[0]))
           this.credJWTPayload = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[1]))
-          this.credJWTSignature = '0x' +  Buffer.from(JwtUtility.base64url.decode(this.credJWT.split('.')[2])).toString('hex')
+          this.credJWTSignature = '0x' + JwtUtility.base64url.toBuffer(this.credJWT.split('.')[2]).toString('hex')
         }
         catch(err){
           alert('⚠️警告: Credential的来源有问题，未按要求格式填写')
@@ -198,11 +207,7 @@ export default {
       .then(result => {
         return new Promise((resolve, reject) => {
           console.log('mission 2 completed')
-          // console.log('req.msg is ' + this.requestJsonToken.msg)
-          // console.log('formated message 1 is:' + web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg)))
-          // console.log('formated message 2 is:' + web3.fromUtf8(web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg))))
           web3.personal.sign(web3.fromUtf8(web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg))), web3.eth.coinbase, (err, res) => {
-          // web3.personal.sign(web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg)), web3.eth.coinbase, (err, res) => {
             if (err) {
               reject("err.toString()")
             }

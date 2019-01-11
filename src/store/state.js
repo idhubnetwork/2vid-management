@@ -7,6 +7,9 @@ let state = {
     balance: null,
     error: null
   },
-  contractInstance: null
+  contractInstance: null,
+  exchangeData: {
+    credJWT: null
+  }
 }
 export default state

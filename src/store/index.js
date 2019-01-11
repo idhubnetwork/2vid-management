@@ -33,6 +33,9 @@ export const store = new Vuex.Store({
     registerContractInstance (state, payload) {
       console.log('Casino contract instance: ', payload)
       state.contractInstance = () => payload
+    },
+    setExchangeDataInstance (state, payload) {
+      state.exchangeData.credJWT = payload
     }
   },
   actions: {
@@ -53,7 +56,14 @@ export const store = new Vuex.Store({
       getContract.then(result => {
         commit('registerContractInstance', result)
       }).catch(e => console.log(e))
+    },
+    setExchangeData ({commit}, payload) {
+      commit('setExchangeDataInstance', payload)
     }
-
+  },
+  getters: {
+    getExchangeData: state => {
+      return state.exchangeData
+    }
   }
 })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="title has-text-centered">
+    <div class="title is-4 has-text-centered">
       <h1>Credential Viewer: Encode</h1>
     </div>
     <div class="field">
@@ -27,12 +27,20 @@
     <div class="field">
       <label class="label">Signed Credential: 带签名的证书</label>
       <textarea class="textarea" v-model="credJWT" placeholder="Signed Credential" readonly></textarea>
+      Take signed credential to:
+      <!-- <button @click="setData()" to="/operations/create" exact>Create</button> -->
+      <router-link @click.native="setData()" to="/operations/create" exact>Create</router-link>
+      /
+      <router-link @click.native="setData()" to="/operations/read" exact>Read</router-link>
+      /
+      <router-link @click.native="setData()" to="/operations/update" exact>Update</router-link>
+      /
+      <router-link @click.native="setData()" to="/operations/delete" exact>Delete</router-link>
+      /
+      <router-link @click.native="setData()" to="/credential/decode" exact>Decode</router-link>
     </div>
     <button class="button is-link is-rounded" @click="signCredential()">
       Sign
-    </button>
-    <button class="button is-rounded" @click="test()">
-      Test
     </button>
   </div>
 </template>
@@ -60,9 +68,9 @@ export default {
         exp: 0,
         // jti: 123,
         net: 'eth_ropsten',
-        ipfs: 'jwt合规说明书链接（可选，默认存储在IPFS上）',
-        context: 'jwt上下文（可选，由上层应用或业务逻辑决定）',
-        status: 11
+        ipfs: '', //jwt合规说明书链接（可选，默认存储在IPFS上）
+        context: '', //jwt上下文（可选，由上层应用或业务逻辑决定）
+        status: 11 // 0b1011
       },
       credJWTSignature: '',
       credJWT: '',
@@ -92,18 +100,38 @@ export default {
       console.log(this.expireDate)
       this.credJWTSigningInput = JwtUtility.base64url.encode(JSON.stringify(this.credJWTHeader)) + '.' + JwtUtility.base64url.encode(JSON.stringify(this.credJWTPayload))
     },
-    sign: function() {
-      web3.personal.sign(web3.fromUtf8(this.credJWTSigningInput), web3.eth.coinbase, (err, res) => {
-        if (err) this.signature = err
-        if (res) {
-          this.credJWTSignature = JwtUtility.base64url(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'))
-          this.credJWT = this.credJWTSigningInput + '.' + this.credJWTSignature
-        }
+    signPromise: function() {
+      return new Promise((resolve, reject) => {
+        web3.personal.sign(web3.fromUtf8(this.credJWTSigningInput), web3.eth.coinbase, (err, res) => {
+          if (err) {
+            this.signature = err
+            reject(err)
+          } else {
+            if (res) {
+              this.credJWTSignature = JwtUtility.base64url(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'))
+              // console.log(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'))
+              // // console.log('0x' + JwtUtility.base64url.toBuffer(this.credJWTSignature).toString('hex'))
+              // console.log(res)
+              this.credJWT = this.credJWTSigningInput + '.' + this.credJWTSignature
+              resolve("Sign is done!")
+            }
+            reject(Error("Sign response error."))
+          }
+        })
       })
     },
     signCredential: function() {
-      this.transfer()
-      this.sign()
+      const transferPromise = new Promise((resolve, reject) => {
+        this.transfer()
+        resolve("Transfer is done!")
+      })
+      transferPromise.then(() => this.signPromise)
+        .then(res => console.log(res))
+        .catch(err => console.error(err))
+    },
+    setData: function() {
+      console.log("Data set: Done!")
+      this.$store.dispatch('setExchangeData', this.credJWT)
     }
   }
 }
