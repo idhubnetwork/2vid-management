@@ -1,13 +1,20 @@
 var path = require('path')
 var webpack = require('webpack')
 
-var CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
+  plugins: [
+    new CleanWebpackPlugin(['dist']),
+    new HtmlWebpackPlugin({
+      template: 'index.html'
+    })
+  ],
   output: {
     path: path.join(__dirname, 'dist'),
-    publicPath: 'dist/',
+    // publicPath: 'dist/',
     filename: 'build.js'
   },
   module: {
