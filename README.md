@@ -28,3 +28,6 @@ npm run build
 # start webservice with express
 npm start
 ```
+
+## Contribution
+Feel free to Please feel free to contact me, take issues and pull requests.
