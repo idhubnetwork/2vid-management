@@ -53,17 +53,17 @@
   </div>
 </template>
 <script>
-import JwtUtility from '@/util/JwtUtility.js'
-import HttpUtility from '@/util/HttpUtility.js'
+import JwtUtility from '@/util/JwtUtility.js';
+import HttpUtility from '@/util/HttpUtility.js';
 
 export default {
-  data () {
+  data() {
     return {
       didOrigin: 'Issuer',
       credJWTSigningInput: '',
       credJWTHeader: {
         alg: 'ES256k',
-        typ: 'JWT'
+        typ: 'JWT',
       },
       credJWTPayload: {
         // iss: '',
@@ -84,191 +84,135 @@ export default {
         sig: '',
       },
       requestJsonTokenMsg: {
-      	did: '',
-      	action: 'UPDATE',
-      	destination: 'idhub',
-      	expiration: 0,
-      	jwt_iss: '',
-      	jwt_sub: '',
-      	jwt_aud: '',
-      	// jwt_jti: 123 //uuid
+        did: '',
+        action: 'UPDATE',
+        destination: 'idhub',
+        expiration: 0,
+        jwt_iss: '',
+        jwt_sub: '',
+        jwt_aud: '',
+        // jwt_jti: 123 //uuid
       },
       requestJsonTokenSig: '',
-      oprationResponse: ''
-    }
+      oprationResponse: '',
+    };
   },
-  mounted: function() {
+  mounted() {
     if (this.$store.getters.getExchangeData.credJWT) {
-      this.credJWT = this.$store.getters.getExchangeData.credJWT
-      console.log("credJWT initialized.")
-      this.$store.dispatch('setExchangeData', null)
+      this.credJWT = this.$store.getters.getExchangeData.credJWT;
+      console.log('credJWT initialized.');
+      this.$store.dispatch('setExchangeData', null);
     }
   },
   methods: {
-    changeDID: function(){
-      if(this.didOrigin == 'Issuer') {
-        this.requestJsonTokenMsg.did = this.requestJsonTokenMsg.jwt_aud
-        this.didOrigin = 'Audience'
-      }
-      else {
-        this.requestJsonTokenMsg.did = this.requestJsonTokenMsg.jwt_iss
-        this.didOrigin = 'Issuer'
+    changeDID() {
+      if (this.didOrigin === 'Issuer') {
+        this.requestJsonTokenMsg.did = this.requestJsonTokenMsg.jwt_aud;
+        this.didOrigin = 'Audience';
+      } else {
+        this.requestJsonTokenMsg.did = this.requestJsonTokenMsg.jwt_iss;
+        this.didOrigin = 'Issuer';
       }
     },
-    setExpireTime: function(value) {
-      var second = (value) ? value : 3600
-      var date = new Date()
+    setExpireTime(value) {
+      const second = (value) || 3600;
+      const date = new Date();
       // 默认有效期 second 秒
-      var expireDate = new Date(date.setSeconds(date.getSeconds() + second))
-      this.requestJsonTokenMsg.expiration = Math.round(expireDate.getTime()/1000)
+      const expireDate = new Date(date.setSeconds(date.getSeconds() + second));
+      this.requestJsonTokenMsg.expiration = Math.round(expireDate.getTime() / 1000);
     },
-    parseCredJWT: function() {
+    parseCredJWT() {
       // Step1: 判断 JWT 是否正确，长度、JSON
-      if (this.credJWT.split('.').length != 3)
-        //⚠️警告：jwt格式应为“aaa.bbb.ccc”
-        alert('⚠️输入格式错误: Credential的格式应符合 JWT 标准:“aaa.bbb.ccc”')
-      else {
+      if (this.credJWT.split('.').length !== 3) {
+        // ⚠️警告：jwt格式应为“aaa.bbb.ccc”
+        alert('⚠️输入格式错误: Credential的格式应符合 JWT 标准:“aaa.bbb.ccc”');
+      } else {
         try {
-          console.log(Buffer.from(JwtUtility.base64url.decode(this.credJWT.split('.')[2])).toString('hex'))
-          this.credJWTHeader = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[0]))
-          this.credJWTPayload = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[1]))
-          this.credJWTSignature = '0x' + JwtUtility.base64url.toBuffer(this.credJWT.split('.')[2]).toString('hex')
+          console.log(Buffer.from(JwtUtility.base64url.decode(this.credJWT.split('.')[2])).toString('hex'));
+          this.credJWTHeader = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[0]));
+          this.credJWTPayload = JSON.parse(JwtUtility.base64url.decode(this.credJWT.split('.')[1]));
+          this.credJWTSignature = `0x${JwtUtility.base64url.toBuffer(this.credJWT.split('.')[2]).toString('hex')}`;
+        } catch (err) {
+          alert('⚠️警告: Credential的来源有问题，未按要求格式填写');
+          throw err;
         }
-        catch(err){
-          alert('⚠️警告: Credential的来源有问题，未按要求格式填写')
-          throw err
-        }
-        console.log('Step1 passes!')
-
+        console.log('Step1 passes!');
         // Step2: 拆分 JWT payload 得到 iss、aud、sub、jti，并赋值
         try {
-          this.requestJsonTokenMsg.did = this.credJWTPayload.iss
-          this.requestJsonTokenMsg.jwt_iss = this.credJWTPayload.iss
-          this.requestJsonTokenMsg.jwt_aud = this.credJWTPayload.aud
-          this.requestJsonTokenMsg.jwt_sub = this.credJWTPayload.sub
+          this.requestJsonTokenMsg.did = this.credJWTPayload.iss;
+          this.requestJsonTokenMsg.jwt_iss = this.credJWTPayload.iss;
+          this.requestJsonTokenMsg.jwt_aud = this.credJWTPayload.aud;
+          this.requestJsonTokenMsg.jwt_sub = this.credJWTPayload.sub;
           // this.credJWTPayload.jti 是否存在，如果存在则赋值给 this.requestJsonTokenMsg.jwt_jti
-        }
-        catch(err) {
-          alert('Step2 error!')
+        } catch (err) {
+          alert('Step2 error!');
         }
       }
     },
-    // packJsonToken: function() {
-    //   var p = new Promise((resolve, reject) => {
-    //     console.log('mission 1 completed')
-    //     this.requestJsonToken.msg = '0x' + Buffer.from(JSON.stringify(this.requestJsonTokenMsg)).toString('hex')
-    //     resolve("Stuff worked!")
-    //   })
-    //   return p
-    // },
-    // signJsonToken: function() {
-    //   var p = new Promise((resolve, reject) => {
-    //     console.log('mission 2 completed')
-    //     web3.personal.sign(web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg)), web3.eth.coinbase, (err, res) => {
-    //       if (err) {
-    //         reject("err.toString()")
-    //       }
-    //       if (res) {
-    //         this.requestJsonToken.sig = res.toString()
-    //         this.requestToken = 'DIDJsonToken ' + '0x' + Buffer.from(JSON.stringify(this.requestJsonToken)).toString('hex')
-    //         resolve("Stuff worked!")
-    //       }
-    //     })
-    //   })
-    //   return p
-    // },
-    // postRequest: function() {
-    //   var p = new Promise((resolve, reject) => {
-    //     console.log('mission 3 completed')
-    //     console.log(HttpUtility.axios.defaults)
-    //     console.log(HttpUtility.myAxios.defaults)
-    //     HttpUtility.myAxios({
-    //       method: 'POST',
-    //       url: '/api/v1/',
-    //       headers: {
-    //         'Content-Type': 'application/json'
-    //       },
-    //       data: JSON.stringify({
-    //         token: this.requestToken,
-    //         jwt: this.credJWT
-    //       })
-    //     })
-    //     .then(res => {
-    //       this.oprationResponse = res.data.toString()
-    //       // console.log('here is the message' + this.message)
-    //       resolve("Stuff worked!")
-    //     }).catch(
-    //       err => {
-    //         console.log(err)
-    //         this.oprationResponse = err.toString()
-    //         reject("err")
-    //       }
-    //     )
-    //   })
-    //   return p
-    // },
-    sendRequestToken: function() {
+    sendRequestToken() {
       return new Promise((resolve, reject) => {
         // Init Parameters
         // oprationResponse set as ''
-        this.oprationResponse = ''
-        this.setExpireTime()
-        console.log("exp is " + this.requestJsonTokenMsg.expiration)
-        console.log('mission 1 completed')
-        this.requestJsonToken.msg = '0x' + Buffer.from(JSON.stringify(this.requestJsonTokenMsg)).toString('hex')
-        resolve("Stuff worked!")
+        this.oprationResponse = '';
+        this.setExpireTime();
+        console.log(`exp is ${this.requestJsonTokenMsg.expiration}`);
+        console.log('mission 1 completed');
+        this.requestJsonToken.msg = `0x${Buffer.from(JSON.stringify(this.requestJsonTokenMsg)).toString('hex')}`;
+        resolve('Stuff worked!');
       })
-      .then(result => {
-        return new Promise((resolve, reject) => {
-          console.log('mission 2 completed')
-          web3.personal.sign(web3.fromUtf8(web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg))), web3.eth.coinbase, (err, res) => {
-            if (err) {
-              reject("err.toString()")
-            }
-            if (res) {
-              this.requestJsonToken.sig = res.toString()
-              this.requestToken = 'DIDJsonToken ' + '0x' + Buffer.from(JSON.stringify(this.requestJsonToken)).toString('hex')
-              resolve("Stuff worked!")
-            }
-          })
+        .then((result) => {
+          const promise = new Promise((resolve, reject) => {
+            console.log('mission 2 completed');
+            window.web3.personal.sign(window.web3.fromUtf8(window.web3.fromUtf8(JSON.stringify(this.requestJsonTokenMsg))), window.web3.eth.coinbase, (err, res) => {
+              if (err) {
+                reject(err);
+              }
+              if (res) {
+                this.requestJsonToken.sig = res.toString();
+                this.requestToken = `DIDJsonToken 0x${Buffer.from(JSON.stringify(this.requestJsonToken)).toString('hex')}`;
+                resolve('Stuff worked!');
+              }
+            });
+          });
+          return promise;
         })
-      })
-      .then(result => {
-        return new Promise((resolve, reject) => {
-          console.log('mission 3 completed')
-          HttpUtility.myAxios({
-            method: 'POST',
-            url: '/api/v1/',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            data: {
-              token: this.requestToken,
-              jwt: this.credJWT
-            }
-          }).then(res => {
-            this.oprationResponse = JSON.stringify(res.data)
-            resolve("Stuff worked!")
-            // console.log('here is the message' + this.message)
-          }).catch(err => {
-            console.log(err)
-            this.oprationResponse = err.toString()
-            reject(err)
-          })
+        .then((result) => {
+          const promise = new Promise((resolve, reject) => {
+            console.log('mission 3 completed');
+            HttpUtility.myAxios({
+              method: 'POST',
+              url: '/api/v1/',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              data: {
+                token: this.requestToken,
+                jwt: this.credJWT,
+              },
+            }).then((res) => {
+              this.oprationResponse = JSON.stringify(res.data);
+              resolve('Stuff worked!');
+              // console.log('here is the message' + this.message)
+            }).catch((err) => {
+              console.log(err);
+              this.oprationResponse = err.toString();
+              reject(err);
+            });
+          });
+          return promise;
         })
-      })
-      .then(result => {
-        console.log('correct')
-        // alert('OK!')
-      })
-      .catch(err => {
-        console.log(err)
-        alert('Some error happen' + err)
-      })
+        .then((result) => {
+          console.log('correct');
+          // alert('OK!')
+        })
+        .catch((err) => {
+          console.log(err);
+          alert(`Some error happen ${err}`);
+        });
       // 1.打包 RequestToken: packJsonToken()
       // 2.签名 RequestToken: signJsonToken()
       // 3.发送 Operation Post 请求: postRequest()
-    }
-  }
-}
+    },
+  },
+};
 </script>

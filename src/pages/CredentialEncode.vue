@@ -20,7 +20,7 @@
       <date-picker v-model="expireDate" :not-before="new Date()" :clearable=false type="datetime" lang="en" format="YYYY-MM-DD hh:mm:ss" @confirm="updateExpireTime()" confirm></date-picker>
     </div>
     <!-- <div class="field">
-      <label class="label">Raw Credential:</label>
+      <label class="label">Credential Modify Permission:</label>
       <textarea class="textarea" v-model="credJWTSigningInput"></textarea>
     </div> -->
     <div class="field">
@@ -44,21 +44,21 @@
   </div>
 </template>
 <script>
-import JwtUtility from '@/util/JwtUtility.js'
-import MathUtility from '@/util/MathUtility.js'
-import DatePicker from 'vue2-datepicker'
+import JwtUtility from '@/util/JwtUtility.js';
+import MathUtility from '@/util/MathUtility.js';
+import DatePicker from 'vue2-datepicker';
 
 export default {
   props: [
 
   ],
-  data () {
+  data() {
     return {
       expireDate: {},
       credJWTSigningInput: '',
       credJWTHeader: {
         alg: 'ES256k',
-        typ: 'JWT'
+        typ: 'JWT',
       },
       credJWTPayload: {
         iss: '',
@@ -67,71 +67,76 @@ export default {
         exp: 0,
         // jti: 123,
         net: 'eth_ropsten',
-        ipfs: '', //jwt合规说明书链接（可选，默认存储在IPFS上）
-        context: '', //jwt上下文（可选，由上层应用或业务逻辑决定）
-        status: 11 // 0b1011
+        ipfs: '', // jwt合规说明书链接（可选，默认存储在IPFS上）
+        context: '', // jwt上下文（可选，由上层应用或业务逻辑决定）
+        status: 11, // 0b1011
       },
       credJWTSignature: '',
       credJWT: '',
-    }
-  }, computed: {
+    };
+  },
+  computed: {
 
-  }, components: {
-    DatePicker
-  }, mounted() {
-    this.resetExpireTime()
-  }, methods: {
-    updateExpireTime: function() {
-      console.log(Math.round(this.expireDate.getTime()/1000))
-      this.credJWTPayload.exp = Math.round(this.expireDate.getTime()/1000)
+  },
+  components: {
+    DatePicker,
+  },
+  mounted() {
+    this.resetExpireTime();
+  },
+  methods: {
+    updateExpireTime() {
+      console.log(Math.round(this.expireDate.getTime() / 1000));
+      this.credJWTPayload.exp = Math.round(this.expireDate.getTime() / 1000);
     },
-    resetExpireTime: function() {
-      var date = new Date()
+    resetExpireTime() {
+      const date = new Date();
       // 默认有效期 month 个月
-      const month = 6
-      this.expireDate = new Date(date.setMonth(date.getMonth() + month))
-      this.credJWTPayload.exp = Math.round(this.expireDate.getTime()/1000)
+      const month = 6;
+      this.expireDate = new Date(date.setMonth(date.getMonth() + month));
+      this.credJWTPayload.exp = Math.round(this.expireDate.getTime() / 1000);
     },
-    test: function() {
-      console.log("test button is clicked")
+    test() {
+      console.log('test button is clicked');
     },
-    transfer: function() {
-      console.log(this.expireDate)
-      this.credJWTSigningInput = JwtUtility.base64url.encode(JSON.stringify(this.credJWTHeader)) + '.' + JwtUtility.base64url.encode(JSON.stringify(this.credJWTPayload))
+    transfer() {
+      console.log(this.expireDate);
+      this.credJWTSigningInput = `${JwtUtility.base64url.encode(JSON.stringify(this.credJWTHeader))}.${JwtUtility.base64url.encode(JSON.stringify(this.credJWTPayload))}`;
     },
-    signPromise: function() {
+    signPromise() {
       return new Promise((resolve, reject) => {
-        web3.personal.sign(web3.fromUtf8(this.credJWTSigningInput), web3.eth.coinbase, (err, res) => {
+        window.web3.personal.sign(window.web3.fromUtf8(this.credJWTSigningInput), window.web3.eth.coinbase, (err, res) => {
           if (err) {
-            this.signature = err
-            reject(err)
+            this.signature = err;
+            reject(err);
           } else {
             if (res) {
-              this.credJWTSignature = JwtUtility.base64url(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'))
+              this.credJWTSignature = JwtUtility.base64url(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'));
               // console.log(Buffer.from(MathUtility.BigNumber(res).toString(16), 'hex'))
               // // console.log('0x' + JwtUtility.base64url.toBuffer(this.credJWTSignature).toString('hex'))
               // console.log(res)
-              this.credJWT = this.credJWTSigningInput + '.' + this.credJWTSignature
-              resolve("Sign is done!")
+              this.credJWT = `${this.credJWTSigningInput}.${this.credJWTSignature}`;
+              resolve('Sign is done!');
             }
-            reject(Error("Sign response error."))
+            reject(Error('Sign response error.'));
           }
-        })
-      })
+        });
+      });
     },
-    signCredential: function() {
+    signCredential() {
       const transferPromise = new Promise((resolve, reject) => {
-        this.transfer()
-        resolve("Transfer is done!")
-      })
-      transferPromise.then(this.signPromise)
+        this.transfer();
+        resolve('Transfer is done!');
+      });
+      transferPromise
+        .then(this.signPromise)
         .then(res => console.log(res))
-        .catch(err => console.error(err))
+        .catch(err => console.error(err));
     },
-    setData: function() {
-      console.log("Data set: Done!")
-      this.$store.dispatch('setExchangeData', this.credJWT)
-    }
-  }
-}
+    setData() {
+      console.log('Data set: Done!');
+      this.$store.dispatch('setExchangeData', this.credJWT);
+    },
+  },
+};
 </script>

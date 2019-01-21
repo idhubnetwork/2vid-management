@@ -1,3 +1,6 @@
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 
-export default { BigNumber }
+const MathUtility = {
+  BigNumber,
+};
+export default MathUtility;

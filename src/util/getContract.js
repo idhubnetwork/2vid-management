@@ -1,11 +1,16 @@
-import Web3 from 'web3'
-import {address, ABI} from './constants/registryContract'
+import Web3 from 'web3';
+import { address, ABI } from './constants/registryContract';
 
-let getContract = new Promise(function (resolve, reject) {
-  let web3 = new Web3(window.web3.currentProvider)
-  let registryContract = web3.eth.contract(ABI)
-  let registryContractInstance = registryContract.at(address)
-  resolve(registryContractInstance)
-})
+const getContract = new Promise((resolve, reject) => {
+  try {
+    const web3 = new Web3(window.web3.currentProvider);
+    const registryContract = web3.eth.contract(ABI);
+    const registryContractInstance = registryContract.at(address);
+    resolve(registryContractInstance);
+  } catch (err) {
+    console.error(err);
+    reject(new Error(err));
+  }
+});
 
-export default getContract
+export default getContract;

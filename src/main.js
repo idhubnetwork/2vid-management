@@ -1,12 +1,16 @@
-import 'bulma'
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import { store } from './store'
+import 'bulma';
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import store from './store';
 
-new Vue({
+const vm = new Vue({
   el: '#app',
   router,
   store,
-  render: h => h(App)
-})
+  render: h => h(App),
+});
+
+Vue.use({
+  vm,
+});

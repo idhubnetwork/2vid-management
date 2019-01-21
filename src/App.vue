@@ -11,32 +11,32 @@
 </template>
 
 <script>
-import NavBar from '@/components/NavBar.vue'
-import FooterBar from '@/components/FooterBar.vue'
+import NavBar from '@/components/NavBar.vue';
+import FooterBar from '@/components/FooterBar.vue';
 
 export default {
   name: 'app',
-  data () {
+  data() {
     return {
       msg: 'Welcome to Your Vue.js App',
       state: {
-        date: new Date()
-      }
-    }
+        date: new Date(),
+      },
+    };
   },
   computed: {
-    getTimestamp: function () {
-      return Math.round(this.state.date/1000)
-    }
+    getTimestamp() {
+      return Math.round(this.state.date / 1000);
+    },
   },
   components: {
-    NavBar, FooterBar
+    NavBar, FooterBar,
   },
-  beforeCreate () {
-    console.log('registerWeb3 Action dispatched from App.vue')
-    this.$store.dispatch('registerWeb3')
-  }
-}
+  beforeCreate() {
+    console.log('registerWeb3 Action dispatched from App.vue');
+    this.$store.dispatch('registerWeb3');
+  },
+};
 </script>
 
 <style lang="scss">

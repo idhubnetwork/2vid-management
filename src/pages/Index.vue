@@ -3,6 +3,6 @@
         <div class="column">
             <h1 class="subtitle has-text-centered"></h1>
         </div>
-      </router-view>
+      <router-view/>
     </div>
 </template>

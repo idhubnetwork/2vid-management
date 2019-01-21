@@ -53,21 +53,21 @@
 </template>
 
 <script>
-import logo from '@/img/logo.png'
+import logo from '@/img/logo.png';
 
 export default {
-    data() {
-        return {
-            logo: logo,
-            isActive: false,
-        }
+  data() {
+    return {
+      logo,
+      isActive: false,
+    };
+  },
+  methods: {
+    isActiveToggle() {
+      this.isActive = !this.isActive;
     },
-    methods: {
-      isActiveToggle() {
-            this.isActive = !this.isActive
-      }
-    }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>
