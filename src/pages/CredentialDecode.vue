@@ -26,6 +26,10 @@
       <label class="label">Credential Expire Time: 证书有效期（当地时间）</label>
       <input class="input" placeholder="valid before" v-model="validBefore" readonly>
     </div>
+    <div class="field">
+      <label class="label">Credential Modify Permission: 证书修改条件</label>
+      <input class="input" placeholder="credential permission" v-model="modifyPermission" readonly>
+    </div>
     <!-- <div class="field">
       <label class="label">Signed Credential:</label>
       <textarea class="textarea" v-model="requestToken" placeholder="Signed Credential"></textarea>
@@ -100,6 +104,28 @@ export default {
   computed: {
     validBefore() {
       return this.credJWTPayload.exp ? new Date(this.credJWTPayload.exp * 1000) : '';
+    },
+    modifyPermission() {
+      const updateStatus = this.credJWTPayload.status & 0b1010;
+      const deleteStatus = this.credJWTPayload.status & 0b0101;
+      let output = '';
+      if (updateStatus === 0b1010) {
+        output += 'Credential Update Permission: Need Audience Agree to Complete.\n ';
+      } else if (updateStatus === 0b1000) {
+        output += 'Credential Update Permission: Only Issuer Can Update.\n ';
+      } else {
+        output += 'Credential Update Permission: Nobody Can Update.\n ';
+      }
+      if (deleteStatus === 0b0100) {
+        output += 'Credential Delete Permission: Only Need Issuer Agree.';
+      } else if (deleteStatus === 0b0001) {
+        output += 'Credential Delete Permission: Only Need Audience Agree.';
+      } else if (deleteStatus === 0b0101) {
+        output += 'Credential Delete Permission: Need Both of Issuer and Audience Agree.';
+      } else {
+        output += 'Credential Delete Permission: Nobody Can Delete.';
+      }
+      return output;
     },
   },
   methods: {

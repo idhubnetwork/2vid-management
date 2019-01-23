@@ -23,6 +23,7 @@ module.exports = {
         ]
       },
     ],
+    "no-bitwise": ["error", { "int32Hint": true }]
     "max-len": ["warn", { "code": 80 }],
     // import rules
 
