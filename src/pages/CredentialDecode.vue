@@ -12,19 +12,19 @@
     </div>
     <div class="field">
       <label class="label">Credential Issuer: 证书签发者</label>
-      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.iss" readonly></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.iss" readonly>
     </div>
     <div class="field">
       <label class="label">Credential Audience: 证书接收方</label>
-      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.aud" readonly></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="credJWTPayload.aud" readonly>
     </div>
     <div class="field">
       <label class="label">Credential Subject: 证书主题</label>
-      <input class="input" placeholder="credential subject defined by did application" v-model="credJWTPayload.sub" readonly></input>
+      <input class="input" placeholder="credential subject defined by did application" v-model="credJWTPayload.sub" readonly>
     </div>
     <div class="field">
       <label class="label">Credential Expire Time: 证书有效期（当地时间）</label>
-      <input class="input" placeholder="valid before" v-model="validBefore" readonly></input>
+      <input class="input" placeholder="valid before" v-model="validBefore" readonly>
     </div>
     <!-- <div class="field">
       <label class="label">Signed Credential:</label>

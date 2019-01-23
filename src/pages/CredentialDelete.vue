@@ -15,19 +15,19 @@
       <button class="button is-round is-white is-small" @click="changeDID">
         {{ didOrigin }}
       </button>
-      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.did"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.did">
     </div>
     <div class="field">
       <label class="label">Issuer: </label>
-      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_iss"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_iss">
     </div>
     <div class="field">
       <label class="label">Audience: </label>
-      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_aud"></input>
+      <input class="input" type="text" placeholder="did:idhub:0x1234567890exampleEthereumAddress" v-model="requestJsonTokenMsg.jwt_aud">
     </div>
     <div class="field">
       <label class="label">Subject: </label>
-      <input class="input" placeholder="credential subject defined by did application" v-model="requestJsonTokenMsg.jwt_sub"></input>
+      <input class="input" placeholder="credential subject defined by did application" v-model="requestJsonTokenMsg.jwt_sub">
     </div>
     <div class="field">
       <label class="label">Result:</label>
